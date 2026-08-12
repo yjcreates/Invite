@@ -68,6 +68,12 @@
     font-size: 13px; font-family: inherit; letter-spacing: .18em; transition: all .15s ease;
   }
   .submit.ready { border-color: var(--ink); background: var(--ink); color: var(--card); cursor: pointer; }
+  .withdraw {
+    margin-top: 12px; background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 12px; color: var(--soft);
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .withdraw:hover { color: var(--chestnut-deep); }
   .toast { font-size: 12.5px; color: var(--chestnut-deep); margin-top: 14px; animation: fade .5s ease; }
   .rsvp { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 24px; }
   .rsvp .eyebrow { margin-bottom: 16px; }
@@ -161,7 +167,7 @@
       <p>워시타워는 매일 열일 중이고,<br />TV 앞자리는 어느새<br />저희 부부가 가장 아끼는 자리가 되었어요.
         <span class="aside">— 물론 제일 좋은 자리는 밤톨이 차지입니다</span>
       </p>
-      <p>받은 마음이 커서, 밥 한 끼로나마<br />감사 인사를 드리고 싶습니다.<br />CTO님도 꼭 함께 와 주세요.</p>
+      <p>받은 마음이 커서, 밥 한 끼로나마<br />감사 인사를 드리고 싶습니다.</p>
     </div>
 
     <div class="divider"><span>❖</span></div>
@@ -174,17 +180,18 @@
       <div class="dates" id="dates"></div>
       <p class="pick-first" id="pickFirst">먼저 성함을 골라 주세요</p>
       <button class="submit" id="submit">일정 전하기</button>
+      <br /><button class="withdraw" id="withdraw" hidden>제출한 일정 회수하기</button>
       <p class="toast" id="toast" hidden></p>
     </div>
 
     <div class="rsvp">
-      <div class="eyebrow">RSVP</div>
+      <div class="eyebrow" style="letter-spacing:.2em">투표 현황</div>
       <div id="results"><p class="empty">불러오는 중입니다</p></div>
     </div>
 
     <div class="closing">
       <p class="place">장소는 날짜가 정해지면<br />따로 안내드리겠습니다.</p>
-      <p class="cat">밤톨이가 현관에서 기다립니다</p>
+      <p class="cat">밤톨이와 함께 기다리겠습니다 🐈</p>
     </div>
   </div>
 </div>
@@ -219,11 +226,12 @@ let votes = {};   // { ceo: ["0905", ...], ... }
 const demoMode = !SCRIPT_URL;
 
 const $ = (id) => document.getElementById(id);
+const hasVoted = (id) => (votes[id] || []).length > 0;
 
 function renderGuests() {
   $("guests").innerHTML = GUESTS.map((g) => `
     <button data-id="${g.id}" class="${who === g.id ? "on" : ""}">
-      ${g.label}${votes[g.id] && who !== g.id ? '<span class="dot">●</span>' : ""}
+      ${g.label}${hasVoted(g.id) && who !== g.id ? '<span class="dot">●</span>' : ""}
     </button>`).join("");
   $("guests").querySelectorAll("button").forEach((b) =>
     b.addEventListener("click", () => {
@@ -238,6 +246,7 @@ function renderDates() {
   box.classList.toggle("active", !!who);
   $("pickFirst").hidden = !!who;
   $("submit").classList.toggle("ready", !!who);
+  $("withdraw").hidden = !(who && hasVoted(who));
   box.innerHTML = DATES.map((d) => `
     <button data-id="${d.id}" class="${picked.includes(d.id) ? "on" : ""}">
       <div class="day">${d.day}</div><div class="num">${d.num}</div>
@@ -252,7 +261,11 @@ function renderDates() {
 
 function renderResults() {
   const box = $("results");
-  const voted = GUESTS.filter((g) => votes[g.id]);
+  if (!loaded) {
+    box.innerHTML = '<p class="empty">현황을 불러오는 중입니다…</p>';
+    return;
+  }
+  const voted = GUESTS.filter((g) => hasVoted(g.id));
   if (!voted.length) {
     box.innerHTML = '<p class="empty">아직 도착한 일정이 없습니다.<br />첫 소식을 기다리고 있어요.</p>';
     return;
@@ -270,7 +283,7 @@ function renderResults() {
         `<span class="pip ${t.voters.some((v) => v.id === g.id) ? "on" : ""}" title="${g.label}"></span>`).join("")}</div>
       <div class="count ${t.voters.length === 3 ? "full" : ""}">${t.voters.length ? t.voters.length + "명 가능" : ""}</div>
     </div>`).join("");
-  html += `<p class="meta">${voted.map((g) => g.label).join(" · ")} 응답 완료 · 다시 누르면 수정됩니다</p>`;
+  html += `<p class="meta">${voted.map((g) => g.label).join(" · ")} 응답 완료 · 다시 제출하면 수정, 회수도 가능해요</p>`;
   box.innerHTML = html;
 }
 
@@ -281,42 +294,61 @@ function showToast(msg) {
   showToast._h = setTimeout(() => { t.hidden = true; }, 4000);
 }
 
+let loaded = false;
+
 async function loadVotes() {
-  if (demoMode) { $("setupNote").hidden = false; renderAll(); return; }
+  if (demoMode) { $("setupNote").hidden = false; loaded = true; renderAll(); return; }
   try {
     const res = await fetch(SCRIPT_URL);
     const data = await res.json();
     votes = data.votes || {};
+    loaded = true;
+    // 사용자가 이미 고르는 중이면 선택은 건드리지 않고 현황만 갱신
+    if (who && !picked.length && votes[who]) picked = [...votes[who]];
+    renderAll();
   } catch (e) {
+    loaded = true;
     $("results").innerHTML = '<p class="empty">결과를 불러오지 못했어요.<br />잠시 후 새로고침해 주세요.</p>';
     renderGuests(); renderDates();
-    return;
   }
-  renderAll();
 }
 
 function renderAll() { renderGuests(); renderDates(); renderResults(); }
 
-$("submit").addEventListener("click", async () => {
-  if (!who) return;
+async function saveVote(dates, doneMsg) {
   const g = GUESTS.find((g) => g.id === who);
-  $("submit").textContent = "전하는 중";
   try {
     if (!demoMode) {
       // Content-Type을 지정하지 않은 단순 POST → Apps Script와 브라우저 모두 통과
-      await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ who, dates: picked }) });
+      await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ who, dates }) });
     }
-    votes[who] = [...picked];
-    showToast(picked.length
-      ? `${g.label} 일정, 잘 받았습니다. 감사합니다!`
-      : `${g.label} 선택을 비워 두었어요. 언제든 다시 골라 주세요.`);
+    votes[who] = [...dates];
+    showToast(doneMsg(g));
     renderAll();
   } catch (e) {
     showToast("저장이 잠시 어긋났어요. 한 번만 다시 눌러 주세요.");
   }
+}
+
+$("submit").addEventListener("click", async () => {
+  if (!who) return;
+  $("submit").textContent = "전하는 중";
+  await saveVote(picked, (g) => picked.length
+    ? `${g.label} 일정, 잘 받았습니다. 감사합니다!`
+    : `${g.label} 선택을 비워 두었어요. 언제든 다시 골라 주세요.`);
   $("submit").textContent = "일정 전하기";
 });
 
+$("withdraw").addEventListener("click", async () => {
+  if (!who) return;
+  $("withdraw").textContent = "회수하는 중…";
+  picked = [];
+  await saveVote([], (g) => `${g.label} 일정을 회수했어요. 언제든 다시 골라 주세요.`);
+  $("withdraw").textContent = "제출한 일정 회수하기";
+});
+
+// 화면은 바로 그리고, 투표 현황만 뒤에서 불러옵니다
+renderAll();
 loadVotes();
 </script>
 </body>
