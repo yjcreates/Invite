@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>수기 · 유진 집들이에 초대합니다</title>
+<meta property="og:title" content="저희 집에 초대합니다" />
+<meta property="og:description" content="수기 · 유진 그리고 밤톨이 — 9월, 편하신 날을 골라 주세요" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --page: #EFEDE7; --card: #FDFCFA; --ink: #33302B; --soft: #8F887E;
+    --line: #E3DFD7; --chestnut: #9C6644; --chestnut-deep: #6F4830; --fill: #F5F1EB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page); color: var(--ink);
+    font-family: 'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+    padding: 34px 14px 70px; min-height: 100vh;
+  }
+  .serif { font-family: 'Gowun Batang', 'Nanum Myeongjo', serif; }
+  .card {
+    max-width: 440px; margin: 0 auto; background: var(--card);
+    border: 1px solid var(--line); border-radius: 4px;
+    box-shadow: 0 20px 50px rgba(51,48,43,.08); padding: 14px 14px 8px;
+  }
+  .frame { border: 1px solid var(--line); padding: 38px 26px 34px; }
+  .eyebrow { font-size: 10.5px; letter-spacing: .42em; color: var(--soft); text-align: center; }
+  h1 { font-family: 'Gowun Batang', serif; font-weight: 400; font-size: 26px; line-height: 1.55; text-align: center; margin: 20px 0 6px; }
+  .hosts { font-family: 'Gowun Batang', serif; font-size: 13px; color: var(--soft); text-align: center; margin-bottom: 26px; }
+  .hosts b { color: var(--chestnut); font-weight: 400; }
+  svg.scene { display: block; width: 82%; max-width: 330px; margin: 0 auto; }
+  .greeting { margin-top: 30px; text-align: center; font-family: 'Gowun Batang', serif; font-size: 15px; line-height: 2.15; word-break: keep-all; }
+  .greeting p { margin-bottom: 22px; }
+  .greeting p:last-child { margin-bottom: 0; }
+  .aside { display: block; font-size: 12.5px; color: var(--soft); margin-top: 6px; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 32px 0 28px; }
+  .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .divider span { color: var(--chestnut); font-size: 11px; }
+  .vote { text-align: center; }
+  .vote h2 { font-family: 'Gowun Batang', serif; font-weight: 400; font-size: 18px; margin: 10px 0 8px; }
+  .hint { font-size: 12.5px; color: var(--soft); line-height: 1.8; margin-bottom: 20px; word-break: keep-all; }
+  .guests { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
+  .guests button {
+    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: transparent; color: var(--ink);
+    font-size: 13px; font-family: inherit; letter-spacing: .02em; transition: all .15s ease;
+  }
+  .guests button.on { background: var(--chestnut); border-color: var(--chestnut); color: #fff; }
+  .guests button .dot { color: var(--chestnut); margin-left: 5px; font-size: 10px; }
+  .dates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; opacity: .35; pointer-events: none; transition: opacity .25s; }
+  .dates.active { opacity: 1; pointer-events: auto; }
+  .dates button { background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; }
+  .dates .day { font-size: 10px; color: var(--soft); letter-spacing: .15em; margin-bottom: 6px; }
+  .dates .num {
+    width: 44px; height: 44px; margin: 0 auto; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Gowun Batang', serif; font-size: 18px;
+    border: 1px solid var(--line); color: var(--ink); transition: all .15s ease;
+  }
+  .dates button.on .num { background: var(--chestnut); border-color: var(--chestnut); color: #fff; }
+  .pick-first { font-size: 12px; color: var(--soft); margin-top: 16px; }
+  .submit {
+    margin-top: 24px; padding: 13px 44px; border-radius: 2px;
+    border: 1px solid var(--line); background: transparent; color: var(--soft);
+    font-size: 13px; font-family: inherit; letter-spacing: .18em; transition: all .15s ease;
+  }
+  .submit.ready { border-color: var(--ink); background: var(--ink); color: var(--card); cursor: pointer; }
+  .toast { font-size: 12.5px; color: var(--chestnut-deep); margin-top: 14px; animation: fade .5s ease; }
+  .rsvp { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 24px; }
+  .rsvp .eyebrow { margin-bottom: 16px; }
+  .empty { text-align: center; font-size: 12.5px; color: var(--soft); line-height: 1.8; }
+  .allin {
+    text-align: center; font-family: 'Gowun Batang', serif; font-size: 14px; color: var(--chestnut-deep);
+    background: var(--fill); border-radius: 3px; padding: 10px 12px; margin-bottom: 16px;
+  }
+  .allin small { font-size: 12px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 5px 6px; }
+  .row .date { width: 62px; font-family: 'Gowun Batang', serif; font-size: 13.5px; }
+  .row .date small { font-size: 11px; color: var(--soft); }
+  .row .pips { flex: 1; display: flex; gap: 6px; }
+  .pip { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--line); }
+  .pip.on { background: var(--chestnut); border-color: var(--chestnut); }
+  .row .count { font-size: 11.5px; color: var(--soft); }
+  .row .count.full { color: var(--chestnut-deep); }
+  .meta { font-size: 11px; color: var(--soft); text-align: center; margin-top: 14px; }
+  .closing { margin-top: 34px; text-align: center; border-top: 1px solid var(--line); padding-top: 26px; }
+  .closing .place { font-family: 'Gowun Batang', serif; font-size: 13.5px; line-height: 2; word-break: keep-all; }
+  .closing .cat { font-family: 'Gowun Batang', serif; font-size: 13px; color: var(--chestnut); margin-top: 18px; }
+  .setup-note {
+    margin: 16px auto 0; max-width: 440px; font-size: 11.5px; color: #A0968A;
+    text-align: center; line-height: 1.7; word-break: keep-all;
+  }
+  .drum { animation: drum 5s linear infinite; transform-origin: 92px 151px; }
+  @keyframes drum { to { transform: rotate(360deg); } }
+  .tail { animation: tail 3.2s ease-in-out infinite; transform-origin: 124px 52px; }
+  @keyframes tail { 0%,100% { transform: rotate(0); } 50% { transform: rotate(9deg); } }
+  .heart { animation: heart 2.4s ease-in-out infinite; transform-origin: 252px 126px; }
+  @keyframes heart { 0%,100% { transform: scale(1); } 30% { transform: scale(1.12); } }
+  .bubble { animation: rise 4.5s ease-in-out infinite; }
+  @keyframes rise { 0% { transform: translateY(0); opacity:.7; } 100% { transform: translateY(-14px); opacity:0; } }
+  .spark { animation: blink 3s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity:.15; } 50% { opacity:.7; } }
+  @keyframes fade { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform:none; } }
+  button:focus-visible { outline: 2px solid var(--chestnut); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .drum,.tail,.heart,.bubble,.spark { animation: none; } }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="frame">
+    <div class="eyebrow">HOUSEWARMING</div>
+    <h1>저희 집에<br />초대합니다</h1>
+    <div class="hosts">수기 · 유진 <b>그리고 밤톨이</b></div>
+
+    <!-- 라인 일러스트: 워시타워 위 밤톨이, TV -->
+    <svg class="scene" viewBox="0 0 340 200" role="img" aria-label="워시타워 위에 앉은 고양이 밤톨이와 TV를 그린 라인 일러스트">
+      <g fill="none" stroke="#33302B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="182" x2="322" y2="182" stroke-width="1.2" opacity="0.5" />
+        <rect x="52" y="62" width="80" height="58" rx="8" />
+        <rect x="52" y="120" width="80" height="62" rx="8" />
+        <circle cx="92" cy="91" r="18" />
+        <circle cx="92" cy="151" r="20" />
+        <g class="drum"><path d="M80 155 q6 -7 12 0 q6 7 12 0" stroke-width="1.4" /></g>
+        <line x1="60" y1="72" x2="76" y2="72" stroke-width="1.4" />
+        <circle class="bubble" cx="142" cy="118" r="4" stroke-width="1.2" />
+        <rect x="196" y="92" width="112" height="72" rx="6" />
+        <rect x="203" y="99" width="98" height="58" rx="3" stroke-width="1.2" opacity="0.55" />
+        <line x1="252" y1="164" x2="252" y2="174" />
+        <line x1="230" y1="176" x2="274" y2="176" />
+      </g>
+      <circle cx="120" cy="72" r="2.4" fill="#33302B" />
+      <g class="cat">
+        <path class="tail" d="M124 52 q18 -4 16 -22" fill="none" stroke="#9C6644" stroke-width="5" stroke-linecap="round" />
+        <path d="M60 62 q-4 -18 14 -22 q2 -12 12 -12 q7 0 10 6 q3 -3 8 -3 q26 0 26 20 q0 6 -4 11" fill="#9C6644" opacity="0.14" />
+        <g fill="none" stroke="#9C6644" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M60 62 q-4 -18 14 -22 q2 -12 12 -12 q7 0 10 6 q3 -3 8 -3 q26 0 26 20 q0 6 -4 11" />
+          <path d="M74 40 l-2 -9 l9 4" />
+          <path d="M92 35 l4 -8 l4 8" />
+          <path d="M82 36 q5 -3 10 0" stroke-width="1.3" />
+          <line x1="70" y1="50" x2="63" y2="49" stroke-width="1" />
+          <line x1="70" y1="54" x2="63" y2="56" stroke-width="1" />
+        </g>
+        <g fill="none" stroke="#6F4830" stroke-linecap="round">
+          <path d="M78 48 q2.5 -3 5 0" stroke-width="1.6" />
+          <path d="M90 48 q2.5 -3 5 0" stroke-width="1.6" />
+          <path d="M84 54 q2.5 2.5 5 0" stroke-width="1.4" />
+        </g>
+      </g>
+      <path class="heart" d="M252 134 c-9 -7 -12 -13 -8 -17 c3 -3 8 -1 8 2 c0 -3 5 -5 8 -2 c4 4 1 10 -8 17 z" fill="#9C6644" opacity="0.9" />
+      <g class="spark" stroke="#33302B" stroke-width="1.1" stroke-linecap="round" opacity="0.6">
+        <line x1="318" y1="70" x2="318" y2="78" /><line x1="314" y1="74" x2="322" y2="74" />
+      </g>
+    </svg>
+
+    <div class="greeting">
+      <p>보내주신 워시타워와 TV 덕분에<br />신혼집이 비로소 집다워졌습니다.</p>
+      <p>워시타워는 매일 열일 중이고,<br />TV 앞자리는 어느새<br />저희 부부가 가장 아끼는 자리가 되었어요.
+        <span class="aside">— 물론 제일 좋은 자리는 밤톨이 차지입니다</span>
+      </p>
+      <p>받은 마음이 커서, 밥 한 끼로나마<br />감사 인사를 드리고 싶습니다.<br />CTO님도 꼭 함께 와 주세요.</p>
+    </div>
+
+    <div class="divider"><span>❖</span></div>
+
+    <div class="vote">
+      <div class="eyebrow">SEPTEMBER</div>
+      <h2>편하신 날을 골라 주세요</h2>
+      <p class="hint">9월 주말 중 되는 날을 모두 눌러 주시면,<br />세 분 모두 가능한 날로 정하겠습니다.</p>
+      <div class="guests" id="guests"></div>
+      <div class="dates" id="dates"></div>
+      <p class="pick-first" id="pickFirst">먼저 성함을 골라 주세요</p>
+      <button class="submit" id="submit">일정 전하기</button>
+      <p class="toast" id="toast" hidden></p>
+    </div>
+
+    <div class="rsvp">
+      <div class="eyebrow">RSVP</div>
+      <div id="results"><p class="empty">불러오는 중입니다</p></div>
+    </div>
+
+    <div class="closing">
+      <p class="place">장소는 날짜가 정해지면<br />따로 안내드리겠습니다.</p>
+      <p class="cat">밤톨이가 현관에서 기다립니다</p>
+    </div>
+  </div>
+</div>
+<p class="setup-note" id="setupNote" hidden>
+  아직 저장 서버(SCRIPT_URL)가 연결되지 않아 미리보기 모드입니다.<br />
+  README의 안내대로 Apps Script URL을 넣으면 투표가 저장돼요.
+</p>
+
+<script>
+/* ═══════════════════════════════════════════════
+   ★ 여기 한 줄만 바꾸면 됩니다 ★
+   README 안내대로 Apps Script 웹 앱을 배포한 뒤,
+   발급받은 URL(https://script.google.com/macros/s/.../exec)을 붙여넣으세요.
+   ═══════════════════════════════════════════════ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4Pm2eQbDHZiw_IbLhKiGWEpS5ovkDYcjjGVbOMFyFuOryiiahbayWo7EfphH7lakZLQ/exec";
+
+const GUESTS = [
+  { id: "ceo",  label: "대표님" },
+  { id: "vice", label: "부대표님" },
+  { id: "cto",  label: "CTO님" },
+];
+const DATES = [
+  { id: "0905", num: 5,  day: "토" }, { id: "0906", num: 6,  day: "일" },
+  { id: "0912", num: 12, day: "토" }, { id: "0913", num: 13, day: "일" },
+  { id: "0919", num: 19, day: "토" }, { id: "0920", num: 20, day: "일" },
+  { id: "0926", num: 26, day: "토" }, { id: "0927", num: 27, day: "일" },
+];
+
+let who = null;
+let picked = [];
+let votes = {};   // { ceo: ["0905", ...], ... }
+const demoMode = !SCRIPT_URL;
+
+const $ = (id) => document.getElementById(id);
+
+function renderGuests() {
+  $("guests").innerHTML = GUESTS.map((g) => `
+    <button data-id="${g.id}" class="${who === g.id ? "on" : ""}">
+      ${g.label}${votes[g.id] && who !== g.id ? '<span class="dot">●</span>' : ""}
+    </button>`).join("");
+  $("guests").querySelectorAll("button").forEach((b) =>
+    b.addEventListener("click", () => {
+      who = b.dataset.id;
+      picked = votes[who] ? [...votes[who]] : [];
+      renderGuests(); renderDates();
+    }));
+}
+
+function renderDates() {
+  const box = $("dates");
+  box.classList.toggle("active", !!who);
+  $("pickFirst").hidden = !!who;
+  $("submit").classList.toggle("ready", !!who);
+  box.innerHTML = DATES.map((d) => `
+    <button data-id="${d.id}" class="${picked.includes(d.id) ? "on" : ""}">
+      <div class="day">${d.day}</div><div class="num">${d.num}</div>
+    </button>`).join("");
+  box.querySelectorAll("button").forEach((b) =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.id;
+      picked = picked.includes(id) ? picked.filter((x) => x !== id) : [...picked, id];
+      renderDates();
+    }));
+}
+
+function renderResults() {
+  const box = $("results");
+  const voted = GUESTS.filter((g) => votes[g.id]);
+  if (!voted.length) {
+    box.innerHTML = '<p class="empty">아직 도착한 일정이 없습니다.<br />첫 소식을 기다리고 있어요.</p>';
+    return;
+  }
+  const tally = DATES.map((d) => ({ ...d, voters: GUESTS.filter((g) => (votes[g.id] || []).includes(d.id)) }));
+  const allIn = tally.filter((t) => t.voters.length === GUESTS.length);
+  let html = "";
+  if (allIn.length) {
+    html += `<div class="allin">${allIn.map((t) => `9월 ${t.num}일(${t.day})`).join(" · ")}<br /><small>세 분 모두 가능한 날입니다</small></div>`;
+  }
+  html += tally.map((t) => `
+    <div class="row">
+      <div class="date">9 / ${t.num} <small>${t.day}</small></div>
+      <div class="pips">${GUESTS.map((g) =>
+        `<span class="pip ${t.voters.some((v) => v.id === g.id) ? "on" : ""}" title="${g.label}"></span>`).join("")}</div>
+      <div class="count ${t.voters.length === 3 ? "full" : ""}">${t.voters.length ? t.voters.length + "명 가능" : ""}</div>
+    </div>`).join("");
+  html += `<p class="meta">${voted.map((g) => g.label).join(" · ")} 응답 완료 · 다시 누르면 수정됩니다</p>`;
+  box.innerHTML = html;
+}
+
+function showToast(msg) {
+  const t = $("toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(showToast._h);
+  showToast._h = setTimeout(() => { t.hidden = true; }, 4000);
+}
+
+async function loadVotes() {
+  if (demoMode) { $("setupNote").hidden = false; renderAll(); return; }
+  try {
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
+    votes = data.votes || {};
+  } catch (e) {
+    $("results").innerHTML = '<p class="empty">결과를 불러오지 못했어요.<br />잠시 후 새로고침해 주세요.</p>';
+    renderGuests(); renderDates();
+    return;
+  }
+  renderAll();
+}
+
+function renderAll() { renderGuests(); renderDates(); renderResults(); }
+
+$("submit").addEventListener("click", async () => {
+  if (!who) return;
+  const g = GUESTS.find((g) => g.id === who);
+  $("submit").textContent = "전하는 중";
+  try {
+    if (!demoMode) {
+      // Content-Type을 지정하지 않은 단순 POST → Apps Script와 브라우저 모두 통과
+      await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ who, dates: picked }) });
+    }
+    votes[who] = [...picked];
+    showToast(picked.length
+      ? `${g.label} 일정, 잘 받았습니다. 감사합니다!`
+      : `${g.label} 선택을 비워 두었어요. 언제든 다시 골라 주세요.`);
+    renderAll();
+  } catch (e) {
+    showToast("저장이 잠시 어긋났어요. 한 번만 다시 눌러 주세요.");
+  }
+  $("submit").textContent = "일정 전하기";
+});
+
+loadVotes();
+</script>
+</body>
+</html>
